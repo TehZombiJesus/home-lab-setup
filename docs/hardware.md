@@ -27,7 +27,7 @@ Business Class: Yes (3-year warranty standard)
 
 ## 🔧 CPU Specifications
 
-### **Intel Core i5-9500T (Upgraded)**
+### **Intel Core i5-9500T**
 
 **Processor Details:**
 ```
