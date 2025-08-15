@@ -46,15 +46,6 @@ graph TB
     CONFIGS --> S3_CRITICAL
     DOCS --> S3_CRITICAL
     PROXMOX --> S3_VM
-    
-    style PROD fill:#ffcdd2
-    style PROXMOX fill:#c8e6c9
-    style CONFIGS fill:#c8e6c9
-    style DOCS fill:#c8e6c9
-    style MEDIA fill:#e1f5fe
-    style SNAPSHOTS fill:#e1f5fe
-    style S3_CRITICAL fill:#d1c4e9
-    style S3_VM fill:#d1c4e9
 ```
 
 ---
