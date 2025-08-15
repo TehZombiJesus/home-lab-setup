@@ -4,17 +4,17 @@ A comprehensive guide for building a privacy-focused home lab with gaming, media
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Hardware Specifications](#hardware-specifications)
-- [System Architecture](#system-architecture)
-- [VM Configurations](#vm-configurations)
-- [Network & Security](#network--security)
-- [Backup Strategy](#backup-strategy)
-- [Security & Privacy](#security--privacy)
-- [Installation Guide](#installation-guide)
+- [Overview](#🎯-overview)
+- [Hardware Specifications](#🖥️-hardware-specifications)
+- [System Architecture](#🏗️-system-architecture)
+- [VM Configurations](#🚀-vm-configurations)
+- [Network & Security](#🌐-network--security)
+- [Backup Strategy](#💾-backup-strategy)
+- [Security & Privacy](#🔒-security--privacy)
+- [Installation Guide](#🛠️-installation-guide)
 - [Service Access](#service-access)
-- [Resource Allocation](#resource-allocation)
-- [Contributing](#contributing)
+- [Resource Allocation](#📊-resource-allocation)
+- [Contributing](#🤝-contributing)
 
 ## 🎯 Overview
 
