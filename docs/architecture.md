@@ -80,13 +80,6 @@ graph TB
     LAN --> VM3
     LAN --> VM4
     LAN --> VM5
-    
-    style CF fill:#f96332
-    style VM1 fill:#e1f5fe
-    style VM2 fill:#f3e5f5
-    style VM3 fill:#e8f5e8
-    style VM4 fill:#fff3e0
-    style VM5 fill:#fce4ec
 ```
 
 ## 🏛️ Architectural Principles
