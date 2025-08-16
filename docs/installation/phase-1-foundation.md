@@ -61,9 +61,9 @@ apt update && apt upgrade -y
 1. In Proxmox web interface: System → Network
 2. Edit your network interface (usually `vmbr0`)
 3. Change from DHCP to static:
-   - **IP Address**: `192.168.1.100/24` (adjust for your network)
-   - **Gateway**: Your router IP (usually `192.168.1.1`)
-   - **DNS**: `192.168.1.1` or `8.8.8.8`
+   - **IP Address**: `10.0.0.100/24` (adjust for your network)
+   - **Gateway**: Your router IP (usually `10.0.0.1`)
+   - **DNS**: `9.9.9.9` (Quad9 - privacy-focused DNS)
 4. Apply configuration and reboot
 
 **✅ Step 2 Complete When**: Proxmox accessible via static IP
@@ -125,7 +125,7 @@ apt update && apt upgrade -y
 1. Note IP address from console
 2. Access web interface: `http://[TRUENAS-IP]`
 3. Login as `root`
-4. **Network** → **Interfaces** → Set static IP if needed
+4. **Network** → **Interfaces** → Set static IP if needed (e.g., `10.0.0.110`)
 5. **System** → **General** → Set timezone
 
 ### 4.3 Create Storage Pool
@@ -140,35 +140,57 @@ apt update && apt upgrade -y
 2. Create these datasets:
    - `media` (for Plex content)
    - `documents` (for Paperless-ngx)
-   - `game-data` (for game server data)
-   - `backups` (for VM backups)
+   - `backups` (for VM backups and configs)
 
 **✅ Step 4 Complete When**: TrueNAS accessible via web interface with storage pool created
 
 ---
 
-## Step 5: Network Shares Setup
+## Step 5: NFS Shares Setup
 
-### 5.1 Create SMB Shares
-1. **Sharing** → **Windows (SMB) Shares** → **Add**
-2. For each dataset, create a share:
-   - **Path**: `/mnt/main-storage/[dataset-name]`
-   - **Name**: `[dataset-name]`
-   - **Purpose**: Default share parameters
+### 5.1 Enable NFS Service
+1. **Services** → **NFS** → **Configure**
+2. **Enable**: ✓ Start Automatically
+3. **NFSv4**: ✓ Enable NFSv4
+4. **Bind IP Addresses**: Select your TrueNAS interface
+5. **Save** and **Start** the service
 
-### 5.2 Create User Account
+### 5.2 Create NFS Shares
+1. **Sharing** → **Unix (NFS) Shares** → **Add**
+2. For each dataset, create an NFS share:
+   
+   **Media Share**:
+   - **Path**: `/mnt/main-storage/media`
+   - **Networks**: `10.0.0.0/24`
+   - **All Directories**: ✓ Enabled
+   - **Quiet**: ✓ Enabled
+   
+   **Documents Share**:
+   - **Path**: `/mnt/main-storage/documents`  
+   - **Networks**: `10.0.0.0/24`
+   - **All Directories**: ✓ Enabled
+   - **Quiet**: ✓ Enabled
+   
+   **Backups Share**:
+   - **Path**: `/mnt/main-storage/backups`
+   - **Networks**: `10.0.0.0/24` 
+   - **All Directories**: ✓ Enabled
+   - **Quiet**: ✓ Enabled
+
+### 5.3 Create User Account
 1. **Accounts** → **Users** → **Add**
 2. **Username**: `homelab-user`
 3. **Password**: Set strong password
-4. **Primary Group**: Create new group `homelab`
-5. **Auxiliary Groups**: Add to appropriate groups
+4. **UID**: `1000` (to match VM user IDs)
+5. **Primary Group**: Create new group `homelab` with GID `1000`
 
-### 5.3 Set Permissions
+### 5.4 Set Dataset Permissions  
 1. **Storage** → **Pools** → `main-storage` → **Edit Permissions**
-2. Set owner to `homelab-user:homelab`
-3. Apply recursively
+2. Set owner to `homelab-user:homelab` (1000:1000)
+3. **Apply recursively**: ✓ Enabled
+4. Repeat for each dataset (media, documents, backups)
 
-**✅ Step 5 Complete When**: You can access SMB shares from another computer
+**✅ Step 5 Complete When**: You can mount NFS shares from another Linux system
 
 ---
 
@@ -176,10 +198,10 @@ apt update && apt upgrade -y
 
 ### ✅ Must Be Working:
 - [ ] Proxmox web interface accessible via static IP
-- [ ] TrueNAS VM running and accessible via web interface
+- [ ] TrueNAS VM running and accessible via web interface  
 - [ ] Storage pool created and healthy
-- [ ] All datasets created
-- [ ] SMB shares accessible from network
+- [ ] All datasets created (media, documents, backups)
+- [ ] NFS shares accessible from network
 - [ ] Both systems have static IP addresses
 
 ### 📊 Resource Usage Check:
@@ -187,6 +209,7 @@ apt update && apt upgrade -y
 - **TrueNAS VM**: 8GB RAM allocated
 - **Total Used**: ~10GB of 64GB available
 - **Storage Pool**: Healthy status, no errors
+- **Network**: NFS service running, shares accessible
 
 ---
 
@@ -208,6 +231,12 @@ apt update && apt upgrade -y
 2. Verify disks are healthy: **Storage** → **Disks**
 3. Recreate pool with different configuration
 4. Check Proxmox VM disk allocation
+
+### If NFS Shares Won't Mount:
+1. Check NFS service status: **Services** → **NFS**
+2. Verify network connectivity: `ping 10.0.0.110`
+3. Check share permissions and network restrictions
+4. Test from another Linux machine: `showmount -e 10.0.0.110`
 
 ### Complete Reset:
 1. If everything fails, reinstall Proxmox from scratch
@@ -232,7 +261,121 @@ apt update && apt upgrade -y
    - Export TrueNAS configuration: **System** → **General** → **Save Config**
    - Save file to external location
 
-**Phase 1 is complete when all completion criteria are met and backups are taken.**
+---
+
+## Step 6: Initial Security Hardening
+
+### 6.1 Proxmox 2FA Setup (YubiKey/TOTP)
+1. **Datacenter** → **Authentication** → **Add** → **TOTP**
+2. **ID**: `totp`
+3. **Description**: `Two-Factor Authentication`
+4. **Issuer**: `Proxmox-HomeLab`
+5. **Digits**: `6`
+6. **Step**: `30`
+
+**For YubiKey Users**:
+1. **Datacenter** → **Authentication** → **Add** → **Yubico OTP**
+2. **ID**: `yubikey`
+3. **API ID** and **Secret Key**: From Yubico account
+4. Configure your YubiKey at yubico.com
+
+**Enable 2FA for root user**:
+1. **Datacenter** → **Permissions** → **Users** → **root** → **Edit**
+2. **Two Factor**: Select `totp` or `yubikey`
+3. **Setup TOTP**: Scan QR code with authenticator app
+4. **Test login**: Logout and login with 2FA
+
+### 6.2 Proxmox SSH Hardening
+```bash
+# SSH into Proxmox host
+nano /etc/ssh/sshd_config
+
+# Add/modify these settings:
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+Port 2222
+Protocol 2
+MaxAuthTries 3
+ClientAliveInterval 300
+ClientAliveCountMax 2
+```
+
+**Create non-root user for SSH**:
+```bash
+# Create admin user
+useradd -m -s /bin/bash -G sudo proxmox-admin
+passwd proxmox-admin
+
+# Set up SSH key authentication (replace with your public key)
+mkdir /home/proxmox-admin/.ssh
+echo "your-ssh-public-key" > /home/proxmox-admin/.ssh/authorized_keys
+chown -R proxmox-admin:proxmox-admin /home/proxmox-admin/.ssh
+chmod 700 /home/proxmox-admin/.ssh
+chmod 600 /home/proxmox-admin/.ssh/authorized_keys
+
+# Restart SSH service
+systemctl restart sshd
+```
+
+### 6.3 TrueNAS Security Hardening  
+1. **System** → **Advanced** → **Access**
+   - **Console Menu**: Disable (prevents local access without login)
+   - **Serial Console**: Disable if not needed
+   
+2. **Network** → **Global Configuration**
+   - **Enable SSH**: Only if needed, change default port
+   - **Root SSH Login**: Disable
+   
+3. **System** → **Alert Services**
+   - Configure email alerts for system issues
+   - Test alert delivery
+
+4. **System** → **Update**
+   - **Check for Updates**: Enable automatic checks
+   - **Download Updates**: Enable for security patches
+
+### 6.4 Initial Cloudflare Setup (Management Access)
+1. **Create Cloudflare Account** (if not already done)
+2. **Add Domain** to Cloudflare DNS management
+3. **Install cloudflared** on a management machine:
+```bash
+# On your main computer/laptop (not Proxmox)
+curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared.deb
+```
+
+4. **Create initial tunnel** for Proxmox management:
+```bash
+cloudflared tunnel login
+cloudflared tunnel create proxmox-mgmt
+cloudflared tunnel route dns proxmox-mgmt proxmox.yourdomain.com
+```
+
+5. **Configure tunnel** (create config file):
+```yaml
+# ~/.cloudflared/config.yml
+tunnel: proxmox-mgmt
+credentials-file: /home/user/.cloudflared/[tunnel-id].json
+
+ingress:
+  - hostname: proxmox.yourdomain.com
+    service: https://10.0.0.100:8006
+    originRequest:
+      noTLSVerify: true
+  - service: http_status:404
+```
+
+6. **Start tunnel**:
+```bash
+cloudflared tunnel run proxmox-mgmt
+```
+
+**✅ Step 6 Complete When**: 
+- [ ] 2FA working for Proxmox web interface
+- [ ] SSH hardened with key-only authentication
+- [ ] TrueNAS secured with basic hardening
+- [ ] Initial Cloudflare tunnel working for Proxmox access (optional at this stage)
 
 ---
 
