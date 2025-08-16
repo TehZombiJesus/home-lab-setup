@@ -1,20 +1,32 @@
-# 🏠 Home Lab Setup - tehzombijesus.ca
+# Privacy-Focused Home Lab Setup
 
-A comprehensive privacy-focused home lab with gaming servers, media automation, and document management capabilities.
+A comprehensive home lab with gaming servers, media automation, and document management capabilities, designed for networks with ISP port restrictions.
 
-## 🎯 Overview
+## What This Provides
 
-This home lab setup provides:
-- **Gaming servers** (Minecraft, Rust, Discord bots) for friends-only access
-- **Media automation** and streaming (self-hosted Spotify replacement)
-- **Document management** with OCR capabilities
-- **Network-wide ad blocking** and DNS management
-- **Secure remote access** without exposing home IP
-- **Privacy-focused** alternatives to big tech services
+**🎮 Gaming Infrastructure**
+- Minecraft servers (Paper, Fabric, Forge, Modpacks)  
+- Rust servers with automated wipe schedules
+- Discord bots and game management via Pterodactyl
 
-All services are accessible through Cloudflare tunnels, bypassing ISP port restrictions and providing enterprise-grade security.
+**📺 Media Ecosystem**
+- Complete Plex media server with hardware transcoding
+- Automated downloading and organization (Sonarr, Radarr, Lidarr)
+- Mobile access and international content support
 
-## 🏗️ System Architecture
+**🔒 Privacy & Security**
+- Network-wide ad blocking with AdGuard Home
+- VPN-protected downloads and traffic
+- Zero Trust authentication via Cloudflare
+- European privacy-focused backup providers
+
+**📊 Management & Monitoring**
+- Web-based administration for all services
+- Real-time monitoring and alerting
+- Automated backup procedures
+- Document management with OCR capabilities
+
+## System Architecture
 
 ```mermaid
 graph TB
@@ -22,19 +34,15 @@ graph TB
         subgraph "VM1: TrueNAS"
             A[Storage & Backups<br/>ZFS Datasets]
         end
-        
         subgraph "VM2: Pterodactyl"
             B[Game Servers<br/>Minecraft, Rust, Discord Bots]
         end
-        
         subgraph "VM3: Docker Services"
             C[Portainer<br/>AdGuard Home<br/>Monitoring<br/>Paperless-ngx]
         end
-        
         subgraph "VM4: Media Server"
             D[Plex Media Server<br/>Hardware Transcoding]
         end
-        
         subgraph "VM5: Media Automation"
             E[Sonarr, Radarr, Lidarr<br/>qBittorrent + VPN]
         end
@@ -44,125 +52,102 @@ graph TB
     F --> C
     F --> D
     F --> E
-    
     H[Internet] --> F
 ```
-# Home Lab Setup
 
 ## Quick Start
-1. [Installation Overview](docs/installation/README.md)
-2. [Phase 1: Foundation](docs/installation/phase-1-foundation.md)
-3. [Phase 2: Docker Services](docs/installation/phase-2-docker-services.md)
-4. [Phase 3: Docker Services](docs/installation/phase-3-docker-services.md)
-5. [Phase 4: Docker Services](docs/installation/phase-4-docker-services.md)
-6. [Troubleshooting](docs/installation/troubleshooting.md)
 
-## Reference Documentation
-- [Hardware Specifications](docs/reference/hardware.md)
-- [System Architecture](docs/reference/architecture.md)
-- [Service Access](docs/reference/services.md)
+### Prerequisites
+- HP EliteDesk 800 G5 with 64GB RAM and RAID 1 storage
+- Domain name registered (for Cloudflare tunnels)
+- 5 free Ubuntu Pro licenses (available to all Ubuntu users)
+- VPN provider subscription for secure downloads
 
-## Maintenance
-- [Backup Strategy](docs/maintenance/backup.md)
-- [Security Guidelines](docs/maintenance/security.md)
+### Installation Process
+**[📖 Complete Installation Guide](docs/installation/README.md)**
 
-<!-- ## 📚 Documentation Structure
+The installation is broken into 4 phases:
 
-### Core Documentation
-- **[Hardware Specifications](docs/hardware.md)** - Detailed system specs and storage configuration
-- **[System Architecture](docs/architecture.md)** - Complete VM layout and service relationships
-- **[VM Configurations](docs/vm-configs.md)** - Individual VM setup and resource allocation
-- **[Network & Security](docs/networking.md)** - Cloudflare setup, DNS, and security stack
-- **[Installation Guide](docs/installation.md)** - Step-by-step implementation phases
+1. **[Foundation](docs/installation/phase-1-foundation.md)** - Proxmox & TrueNAS storage (2-3 hours)
+2. **[Docker Services](docs/installation/phase-2-docker-services.md)** - Container platform & core services (1-2 hours)  
+3. **[Gaming & Media](docs/installation/phase-3-gaming-media.md)** - Entertainment infrastructure (2-4 hours)
+4. **[Security & Monitoring](docs/installation/phase-4-security-monitoring.md)** - External access & monitoring (1-2 hours)
 
-### Service Documentation
-- **[Service Access](docs/services.md)** - Complete URL reference and service descriptions
-- **[Backup Strategy](docs/backup.md)** - Local and offsite backup configurations
-- **[Security & Privacy](docs/security.md)** - Authentication, access control, and privacy measures
+Each phase includes detailed rollback procedures and validation steps.
 
-## ⚡ Quick Start --> 
+## Important Design Decisions
 
-1. **Prerequisites Check**
-   - HP EliteDesk 800 G5 with upgraded specs
-   - 5 Ubuntu Pro licenses available
-   - Domain name registered (tehzombijesus.ca)
-   - VPN provider subscription for secure downloads
+### ISP Port Restrictions
+This setup is specifically designed for ISPs that block incoming ports (25, 53, 55, 77, 135, 139, 161, 162, 445, 1080, 4444). **Standard port forwarding will not work** - all external access uses Cloudflare tunnels.
 
-2. **Installation Order**
-   ```bash
-   Phase 1: Proxmox + TrueNAS (Storage Foundation)
-   Phase 2: Docker Services VM (Container Platform)
-   Phase 3: Gaming + Media VMs (Core Services)  
-   Phase 4: Security + Monitoring (Protection Layer)
-   ```
+### Web-First Administration
+All management is performed through web interfaces - SSH access is not required for day-to-day operations. This makes the system accessible from mobile devices and simplifies remote administration.
 
-3. **First Access**
-   - Configure Cloudflare DNS and tunnels
-   - Set up Zero Trust authentication
-   - Deploy core containers via Portainer
+### Privacy Focus
+European providers are used for offsite backups, VPN protection covers all downloads, and services are isolated between VMs to prevent cross-contamination.
 
-## 🔗 Service Quick Links
-
-Once deployed, access your services at:
-
-| Category | Service | URL |
-|----------|---------|-----|
-| **Gaming** | Pterodactyl Panel | `games.tehzombijesus.ca` |
-| **Media** | Plex Server | `plex.tehzombijesus.ca` |
-| **Management** | Service Dashboard | `status.tehzombijesus.ca` |
-| **Documents** | Paperless-ngx | `docs.tehzombijesus.ca` |
-
-*See [Service Access Documentation](docs/services.md) for complete URL list*
-
-## 📊 Resource Summary
+## System Specifications
 
 | Component | Specification | Usage |
-|-----------|---------------|-------|
-| **Total RAM** | 64GB | 60-68GB allocated |
-| **Storage** | 2TB RAID 1 | ~1.4TB for media |
+|-----------|---------------|--------|
+| **Total RAM** | 64GB | 52GB allocated to VMs, 12GB for host |
+| **Storage** | 2TB RAID 1 | ~1.4TB available for media storage |
 | **VMs** | 5 Virtual Machines | Ubuntu Pro licensed |
-| **Services** | 15+ Containerized | Docker managed |
+| **Services** | 15+ Containerized | Docker managed via Portainer |
 
-## 🚨 Important Notes
+## Documentation Structure
 
-- **ISP Port Restrictions:** Incoming ports blocked: `25,53,55,77,135,139,161,162,445,1080,4444`
-- **Cloudflare Tunnels Required:** No port forwarding possible due to ISP limitations
-- **Privacy Focus:** European providers used for offsite storage
-- **Container Management:** All services deployed via Portainer web interface
-- **Zero Maintenance SSH:** All admin tasks through web interfaces
+### Installation
+- **[Installation Overview](docs/installation/README.md)** - Complete setup guide
+- **[Troubleshooting](docs/installation/troubleshooting.md)** - Common issues and solutions
 
-## 🎮 Supported Game Servers
+### Reference
+- **[Hardware Specifications](docs/reference/hardware.md)** - Detailed system requirements
+- **[System Architecture](docs/reference/architecture.md)** - VM layout and service relationships
+- **[VM Configurations](docs/reference/vm-configs.md)** - Resource allocation and settings
+- **[Network & Security](docs/reference/networking.md)** - Cloudflare setup and security stack
+- **[Service Access](docs/reference/services.md)** - Complete URL reference and descriptions
 
-- **Minecraft** - Paper, Fabric, Forge, Modpacks
-- **Rust** - Full server with wipe schedules  
-- **Discord Bots** - Node.js and Python support
-- **Expandable** - Easy addition of new game types via Pterodactyl
+### Maintenance  
+- **[Backup Strategy](docs/maintenance/backup.md)** - Local and offsite backup procedures
+- **[Security Guidelines](docs/maintenance/security.md)** - Authentication and access control
+- **[Monitoring Setup](docs/maintenance/monitoring.md)** - System health and alerting
 
-## 🎬 Media Capabilities
+## Service Categories
 
-- **Movies & TV Shows** - Automated download and organization
-- **Music Library** - Complete Spotify replacement with Plexamp
-- **International Content** - K-drama and C-drama support
-- **Quality Control** - Automated upgrading and management
-- **Mobile Access** - Full Plex mobile app support
+### Gaming Servers
+| Service | Description | Access |
+|---------|-------------|--------|
+| Pterodactyl Panel | Game server management | games.tehzombijesus.ca |
+| Minecraft Servers | Multiple server types and modpacks | Via game clients |
+| Rust Server | Full server with automated wipes | Via game client |
 
-## 🛡️ Security Features
+### Media Services  
+| Service | Description | Access |
+|---------|-------------|--------|
+| Plex Media Server | Movies, TV shows, music streaming | plex.tehzombijesus.ca |
+| Sonarr | TV show automation | Internal network only |
+| Radarr | Movie automation | Internal network only |
+| Lidarr | Music automation | Internal network only |
 
-- **Zero Trust Architecture** - Cloudflare authentication for all services
-- **VPN Protection** - All downloads through encrypted tunnels
-- **Service Isolation** - VM separation prevents cross-contamination
-- **Encrypted Backups** - Offsite storage with client-side encryption
-- **Network Security** - AdGuard Home blocks threats network-wide
+### Core Services
+| Service | Description | Access |
+|---------|-------------|--------|
+| Portainer | Container management | Internal network only |
+| AdGuard Home | Network-wide ad blocking | Internal network only |
+| Paperless-ngx | Document management with OCR | docs.tehzombijesus.ca |
+| System Monitoring | Uptime and performance tracking | status.tehzombijesus.ca |
 
-## 📈 Monitoring & Alerts
+## Ready to Build?
 
-- **Uptime Monitoring** - Real-time service availability tracking
-- **System Metrics** - CPU, RAM, storage, and network monitoring
-- **Service Health** - Container status and resource usage
-- **Automated Alerts** - Notification when services go offline
+**[🚀 Start Installation](docs/installation/README.md)**
+
+The installation guide includes:
+- Phase-by-phase approach for stable deployment
+- Detailed rollback procedures for each step
+- Resource usage validation and troubleshooting
+- Complete configuration examples and templates
 
 ---
 
-**Ready to build?** Start with the [Installation Guide](docs/installation.md) and follow the phase-by-phase approach for a stable, secure deployment.
-
-**Need help?** Each documentation section includes troubleshooting tips and common solutions for a smooth setup experience.
+*This is a personal home lab setup guide. All service URLs and configurations are specific to my environment and should be adapted for your own domain and requirements.*
