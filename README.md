@@ -47,8 +47,26 @@ graph TB
     
     H[Internet] --> F
 ```
+# Home Lab Setup
 
-## 📚 Documentation Structure
+## Quick Start
+1. [Installation Overview](docs/installation/README.md)
+2. [Phase 1: Foundation](docs/installation/phase-1-foundation.md)
+3. [Phase 2: Docker Services](docs/installation/phase-2-docker-services.md)
+4. [Phase 3: Docker Services](docs/installation/phase-3-docker-services.md)
+5. [Phase 4: Docker Services](docs/installation/phase-4-docker-services.md)
+6. [Troubleshooting](docs/installation/troubleshooting.md)
+
+## Reference Documentation
+- [Hardware Specifications](docs/reference/hardware.md)
+- [System Architecture](docs/reference/architecture.md)
+- [Service Access](docs/reference/services.md)
+
+## Maintenance
+- [Backup Strategy](docs/maintenance/backup.md)
+- [Security Guidelines](docs/maintenance/security.md)
+
+<!-- ## 📚 Documentation Structure
 
 ### Core Documentation
 - **[Hardware Specifications](docs/hardware.md)** - Detailed system specs and storage configuration
@@ -62,7 +80,7 @@ graph TB
 - **[Backup Strategy](docs/backup.md)** - Local and offsite backup configurations
 - **[Security & Privacy](docs/security.md)** - Authentication, access control, and privacy measures
 
-## ⚡ Quick Start
+## ⚡ Quick Start --> 
 
 1. **Prerequisites Check**
    - HP EliteDesk 800 G5 with upgraded specs
