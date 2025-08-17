@@ -1,7 +1,8 @@
 ## Phase 3 Completion Checklist
 
 - [ ] **VM2 (Pterodactyl)**: Gaming server operational with CrowdSec hardening
-- [ ] **VM4 (# Phase 3: Gaming & Media VMs with Integrated Hardening
+- [ ] **VM4 (Media Server)**: Plex Media Server with hardware transcoding
+- [ ] **VM5 (Media Automation)**: Sonarr, Radarr, Lidarr, qBittorrent + VPN operational
 
 ## Overview
 Phase 3 deploys the core entertainment services: gaming servers, media streaming, and automated media management. Each VM is hardened immediately after deployment to maintain security throughout the build process.
