@@ -8,17 +8,18 @@ A comprehensive home lab with gaming servers, media automation, and document man
 - Minecraft servers (Paper, Fabric, Forge, Modpacks)  
 - Rust servers with automated wipe schedules
 - Discord bots and game management via Pterodactyl
+- and more services potentially
 
 **📺 Media Ecosystem**
+- Usenet only – all media‑automation traffic will go through a TLS‑secured Usenet provider.
 - Complete Plex media server with hardware transcoding
 - Automated downloading and organization (Sonarr, Radarr, Lidarr)
 - Mobile access and international content support
 
 **🔒 Privacy & Security**
 - Network-wide ad blocking with AdGuard Home
-- VPN-protected downloads and traffic
 - Zero Trust authentication via Cloudflare
-- European privacy-focused backup providers
+- Canadian privacy-focused backup providers (not sure if OVH falls into that category)
 
 **📊 Management & Monitoring**
 - Web-based administration for all services
