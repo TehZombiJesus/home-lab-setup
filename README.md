@@ -1,154 +1,182 @@
-# Privacy-Focused Home Lab Setup
+# 🏠 Homelab Infrastructure Setup
 
-A comprehensive home lab with gaming servers, media automation, and document management capabilities, designed for networks with ISP port restrictions.
+Complete infrastructure documentation for personal homelab deployment.
 
-## What This Provides
+## 🖥️ Hardware & Core Infrastructure
 
-**🎮 Gaming Infrastructure**
-- Minecraft servers (Paper, Fabric, Forge, Modpacks)  
-- Rust servers with automated wipe schedules
-- Discord bots and game management via Pterodactyl
-- and more services potentially
+### 💻 Physical Hardware
+- **System**: HP EliteDesk 800 G5 💪
+- **Memory**: 64GB RAM 🚀
+- **Storage**: 2TB RAID 1 (local redundancy) 💾
+- **Network**: 10.0.0.x subnet (single network, no VLANs) 🌐
+- **Domain**: tehzombijesus.ca (owned) 🌍
 
-**📺 Media Ecosystem**
-- Usenet only – all media‑automation traffic will go through a TLS‑secured Usenet provider.
-- Complete Plex media server with hardware transcoding
-- Automated downloading and organization (Sonarr, Radarr, Lidarr)
-- Mobile access and international content support
+### ⚡ Virtualization Stack
+- **Hypervisor**: Proxmox VE (preferred platform) 📦
+- **Storage**: TrueNAS with ZFS datasets 🗄️
+- **Container Management**: Portainer (Docker orchestration for novice users) 🐳
+- **OS Licensing**: Ubuntu Pro (5 free licenses available) 🐧
 
-**🔒 Privacy & Security**
-- Network-wide ad blocking with AdGuard Home
-- Zero Trust authentication via Cloudflare
-- Canadian privacy-focused backup providers (not sure if OVH falls into that category)
+## 🛡️ Network & Security
 
-**📊 Management & Monitoring**
-- Web-based administration for all services
-- Real-time monitoring and alerting
-- Automated backup procedures
-- Document management with OCR capabilities
+### 🚫 ISP Port Restrictions
+**Blocked Incoming**: 25, 53, 55, 77, 135, 139, 161, 162, 445, 1080, 4444  
+**Blocked Outgoing**: 25, 139, 445, 4444
 
-## System Architecture
+### 🔐 Access & Security Model
+- **External Access**: Cloudflare tunnels only (maximize free tier services) ☁️
+- **SSH**: Local network access only, never external 🚪
+- **Authentication**: YubiKey 5 NFC integration wherever supported 🔑
+- **Security Philosophy**: Secure but practical for personal use (avoid enterprise overkill) ⚖️
+- **Administration**: Web-based interfaces preferred over CLI 🌐
 
-```mermaid
-graph TB
-    subgraph "HP EliteDesk 800 G5 - Proxmox Host (RAID 1)"
-        subgraph "VM1: TrueNAS"
-            A[Storage & Backups<br/>ZFS Datasets]
-        end
-        subgraph "VM2: Pterodactyl"
-            B[Game Servers<br/>Minecraft, Rust, Discord Bots]
-        end
-        subgraph "VM3: Docker Services"
-            C[Portainer<br/>AdGuard Home<br/>Monitoring<br/>Paperless-ngx]
-        end
-        subgraph "VM4: Media Server"
-            D[Plex Media Server<br/>Hardware Transcoding]
-        end
-        subgraph "VM5: Media Automation"
-            E[Sonarr, Radarr, Lidarr<br/>qBittorrent + VPN]
-        end
-    end
-    
-    F[Cloudflare Tunnels] --> B
-    F --> C
-    F --> D
-    F --> E
-    H[Internet] --> F
+## 💾 Backup Strategy (3-2-1 Rule)
+
+### 🏗️ Infrastructure Overview
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    🏠 HOMELAB INFRASTRUCTURE                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────┐    ┌──────────────────┐    ┌─────────────┐ │
+│  │  💻 HP EliteDesk │    │   🌐 Network     │    │ ☁️ External │ │
+│  │     800 G5      │    │   10.0.0.x       │    │   Access    │ │
+│  │   64GB RAM      │────│   Single Net     │────│ Cloudflare  │ │
+│  │   2TB RAID 1    │    │   No VLANs       │    │  Tunnels    │ │
+│  └─────────────────┘    └──────────────────┘    └─────────────┘ │
+│           │                                                     │
+│           ▼                                                     │
+│  ┌─────────────────┐    ┌──────────────────┐    ┌─────────────┐ │
+│  │  📦 Proxmox VE  │    │  🗄️ TrueNAS      │    │ 🐳 Docker   │ │
+│  │  Hypervisor     │────│  ZFS Datasets    │────│  Portainer  │ │
+│  │  Ubuntu Pro     │    │  Primary Storage │    │  Containers │ │
+│  └─────────────────┘    └──────────────────┘    └─────────────┘ │
+│                                   │                             │
+│                                   ▼                             │
+│                          ┌─────────────────┐                   │
+│                          │   🚀 Services   │                   │
+│                          │                 │                   │
+│                          │ 📺 Plex         │                   │
+│                          │ 🎬 Sonarr/Radarr│                   │
+│                          │ 🎮 Pterodactyl  │                   │
+│                          │ 📄 Paperless    │                   │
+│                          │ 🛡️ AdGuard      │                   │
+│                          └─────────────────┘                   │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Quick Start
+### 🔄 Backup Architecture
+```mermaid
+graph TD
+    A["💻 HP EliteDesk 800 G5<br/>64GB RAM<br/>2TB RAID 1"] --> B["📦 Proxmox VE<br/>Hypervisor"]
+    B --> C["🗄️ TrueNAS<br/>ZFS Datasets"]
+    C --> D["🐳 Docker<br/>Portainer"]
+    
+    D --> E["📺 Plex<br/>Media Server"]
+    D --> F["🎬 Sonarr/Radarr<br/>Content Management"]
+    D --> G["🎮 Pterodactyl<br/>Game Servers"]
+    D --> H["📄 Paperless-ngx<br/>Documents"]
+    D --> I["🛡️ AdGuard Home<br/>DNS Filtering"]
+    D --> J["💾 Duplicati<br/>Backup Tool"]
+    
+    K["🌐 10.0.0.x Network<br/>Single Subnet"] --> A
+    L["☁️ Cloudflare Tunnels<br/>External Access"] --> D
+    
+    C --> M["💾 Local Backup<br/>Primary"]
+    M --> N["🗄️ NAS Backup<br/>Secondary"]
+    N --> O["🇨🇦 OVH Montreal<br/>Object Storage<br/>Offsite"]
+    
+    style A fill:#2d5aa0,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#4caf50,stroke:#333,stroke-width:2px,color:#fff
+    style O fill:#ff6b6b,stroke:#333,stroke-width:2px,color:#fff
+    style L fill:#f39c12,stroke:#333,stroke-width:2px,color:#fff
+```
 
-### Prerequisites
-- HP EliteDesk 800 G5 with 64GB RAM and RAID 1 storage
-- Domain name registered (for Cloudflare tunnels)
-- 5 free Ubuntu Pro licenses (available to all Ubuntu users)
-- VPN provider subscription for secure downloads
+**3-2-1 Backup Flow:**
+```
+💾 Local RAID 1 → 🗄️ TrueNAS (ZFS) → 🇨🇦 OVH Montreal Object Storage
+     ↑                 ↑                          ↑
+  Primary          Secondary                   Offsite
+```
 
-### Installation Process
-**[📖 Complete Installation Guide](docs/installation/README.md)**
+### 🛠️ Backup Implementation
+- **Tool**: Duplicati (web-based interface, Docker deployment) 🌐
+- **Encryption**: AES-256 built-in encryption 🔒
+- **Destination**: OVH Standard Object Storage - Montreal 🇨🇦
+- **Cost**: ~$0.022/GB/month (estimated $1-5/month for critical data) 💰
+- **Scope**: Configs, databases, documents, application data 📋
+- **Exclusions**: Media files (re-downloadable), OS images (rebuildable) ❌
 
-The installation is broken into 4 phases:
+### ✅ Backup Selection Criteria
+- **Critical Data**: Configuration files, databases, Paperless documents 📄
+- **Application Data**: Docker compose files, game saves (if irreplaceable) 🎮
+- **Skip**: Media libraries, system images, easily replaceable data ⏭️
 
-1. **[Foundation](docs/installation/phase-1-foundation.md)** - Proxmox & TrueNAS storage (2-3 hours)
-2. **[Docker Services](docs/installation/phase-2-docker-services.md)** - Container platform & core services (1-2 hours)  
-3. **[Gaming & Media](docs/installation/phase-3-gaming-media.md)** - Entertainment infrastructure (2-4 hours)
-4. **[Security & Monitoring](docs/installation/phase-4-security-monitoring.md)** - External access & monitoring (1-2 hours)
+## 🚀 Core Services
 
-Each phase includes detailed rollback procedures and validation steps.
+### ⚙️ Infrastructure Services
+- **DNS**: AdGuard Home (network-wide ad blocking) 🛡️
+- **Monitoring**: Simple service uptime and resource monitoring 📊
+- **Alerts**: Email notifications for critical alerts only 📧
+- **Updates**: Automated where safe, manual for major changes 🔄
 
-## Important Design Decisions
+### 🎬 Media & Entertainment
+- **Media Server**: Plex 📺
+- **Content Management**: Sonarr, Radarr, Lidarr (Usenet automation) 🎭
+- **Downloads**: Swiss Usenet providers (UsenetExpress for privacy) 🇨🇭
+- **Gaming**: Pterodactyl panel for Minecraft/Rust servers, Discord bots 🎮
 
-### ISP Port Restrictions
-This setup is specifically designed for ISPs that block incoming ports (25, 53, 55, 77, 135, 139, 161, 162, 445, 1080, 4444). **Standard port forwarding will not work** - all external access uses Cloudflare tunnels.
+### 📋 Productivity & Management
+- **Document Management**: Paperless-ngx 📄
+- **Container Orchestration**: Portainer (web-based Docker management) 🐳
 
-### Web-First Administration
-All management is performed through web interfaces - SSH access is not required for day-to-day operations. This makes the system accessible from mobile devices and simplifies remote administration.
+## 🌐 Service Access & Deployment
 
-### Privacy Focus
-European providers are used for offsite backups, VPN protection covers all downloads, and services are isolated between VMs to prevent cross-contamination.
+### 🚀 External Access Strategy
+- **Method**: Cloudflare tunnels exclusively ☁️
+- **Benefits**: No exposed ports, free tier utilization, built-in security 🛡️
+- **Services**: Web interfaces accessible remotely via secure tunnels 🔒
 
-## System Specifications
+### 🐳 Container Management
+- **Platform**: Docker with Portainer web UI 📦
+- **Skill Level**: Designed for novice Docker users 👶
+- **Deployment**: Web-based container management and monitoring 🌐
 
-| Component | Specification | Usage |
-|-----------|---------------|--------|
-| **Total RAM** | 64GB | 52GB allocated to VMs, 12GB for host |
-| **Storage** | 2TB RAID 1 | ~1.4TB available for media storage |
-| **VMs** | 5 Virtual Machines | Ubuntu Pro licensed |
-| **Services** | 15+ Containerized | Docker managed via Portainer |
+## 🔧 Maintenance & Operations
 
-## Documentation Structure
+### 🔄 Update Strategy
+- **Automated**: Security updates and minor versions where safe ✅
+- **Manual**: Major version upgrades and significant changes ✋
+- **Testing**: Non-production testing preferred for critical services 🧪
 
-### Installation
-- **[Installation Overview](docs/installation/README.md)** - Complete setup guide
-- **[Troubleshooting](docs/installation/troubleshooting.md)** - Common issues and solutions
+### 📊 Monitoring Philosophy
+- **Scope**: Service availability and basic resource monitoring 📈
+- **Alerting**: Email notifications for critical issues only 📧
+- **Simplicity**: Avoid over-monitoring and alert fatigue 🎯
 
-### Reference
-- **[Hardware Specifications](docs/reference/hardware.md)** - Detailed system requirements
-- **[System Architecture](docs/reference/architecture.md)** - VM layout and service relationships
-- **[VM Configurations](docs/reference/vm-configs.md)** - Resource allocation and settings
-- **[Network & Security](docs/reference/networking.md)** - Cloudflare setup and security stack
-- **[Service Access](docs/reference/services.md)** - Complete URL reference and descriptions
+## 💳 Payment & Privacy Considerations
 
-### Maintenance  
-- **[Backup Strategy](docs/maintenance/backup.md)** - Local and offsite backup procedures
-- **[Security Guidelines](docs/maintenance/security.md)** - Authentication and access control
-- **[Monitoring Setup](docs/maintenance/monitoring.md)** - System health and alerting
+### 🔐 Privacy-Focused Providers
+- **Backup**: OVH Montreal (Canadian data sovereignty) 🇨🇦
+- **Downloads**: Swiss Usenet providers (UsenetExpress) 🇨🇭
+- **Payment**: Proton Wallet/Bitcoin for privacy-focused services ₿
 
-## Service Categories
+### 🌍 Geographic Preferences
+- **Backup Storage**: Montreal, Canada (local data residency) 🏔️
+- **Network**: Canadian routing when possible 🍁
+- **Compliance**: Canadian data protection alignment ⚖️
 
-### Gaming Servers
-| Service | Description | Access |
-|---------|-------------|--------|
-| Pterodactyl Panel | Game server management | games.tehzombijesus.ca |
-| Minecraft Servers | Multiple server types and modpacks | Via game clients |
-| Rust Server | Full server with automated wipes | Via game client |
+## 🌐 Network Architecture
 
-### Media Services  
-| Service | Description | Access |
-|---------|-------------|--------|
-| Plex Media Server | Movies, TV shows, music streaming | plex.tehzombijesus.ca |
-| Sonarr | TV show automation | Internal network only |
-| Radarr | Movie automation | Internal network only |
-| Lidarr | Music automation | Internal network only |
+### 🏗️ Simple Network Design
+- **Topology**: Single 10.0.0.x network 🕸️
+- **Complexity**: No VLANs or special routing hardware ⚡
+- **Management**: Standard home networking approach 🏠
+- **Access**: Cloudflare tunnels for external connectivity ☁️
 
-### Core Services
-| Service | Description | Access |
-|---------|-------------|--------|
-| Portainer | Container management | Internal network only |
-| AdGuard Home | Network-wide ad blocking | Internal network only |
-| Paperless-ngx | Document management with OCR | docs.tehzombijesus.ca |
-| System Monitoring | Uptime and performance tracking | status.tehzombijesus.ca |
+## 📚 Documentation Standards
 
-## Ready to Build?
-
-**[🚀 Start Installation](docs/installation/README.md)**
-
-The installation guide includes:
-- Phase-by-phase approach for stable deployment
-- Detailed rollback procedures for each step
-- Resource usage validation and troubleshooting
-- Complete configuration examples and templates
-
----
-
-*This is a personal home lab setup guide. All service URLs and configurations are specific to my environment and should be adapted for your own domain and requirements.*
+### 📊 Visual Documentation
+- **Diagrams**: Black/monochrome only ⚫
+- **Compatibility**: GitHub dark theme optimized 🌙
+- **Simplicity**: Clear, functional documentation over visual flair ✨
