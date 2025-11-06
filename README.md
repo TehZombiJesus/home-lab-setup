@@ -12,7 +12,7 @@ This repository contains the complete configuration and documentation for my per
 
 ## 🏗️ Infrastructure Architecture
 
-```
+```mermaid
 flowchart TD
     subgraph "🌐 External Access"
         CF[☁️ Cloudflare Tunnels]
