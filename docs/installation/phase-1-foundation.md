@@ -1,161 +1,151 @@
-# Home Lab Installation Guide
+# Phase 1: Foundation Setup – Proxmox + TrueNAS
 
-## Phase 1: Proxmox + TrueNAS (Storage Foundation)
+> **This guide walks you through the initial infrastructure setup for your homelab: Proxmox installation, storage foundation with TrueNAS, core hardening, and prep for next phases.**
 
-### Pre-Phase Checklist
+---
+
+## 📑 Table of Contents
+
+- [✅ Pre-Phase Checklist](#pre-phase-checklist)
+- [🚦 Phase Overview](#phase-1-overview)
+- [⚡ Step 1: Proxmox VE Installation](#step-1-proxmox-ve-installation)
+- [🔧 Step 2: Proxmox Initial Configuration](#step-2-proxmox-initial-configuration)
+- [💾 Step 3: TrueNAS VM Creation](#step-3-truenas-vm-creation)
+- [📁 NFS & Dataset Setup](#nfs-and-dataset-setup)
+- [🧪 Verification & Troubleshooting](#verification--troubleshooting)
+- [🔒 Step 6: Initial Security Hardening](#step-6-initial-security-hardening)
+- [🗂️ Backups & Snapshots](#backups--snapshots)
+- [➡️ Next Steps](#next-steps)
+
+---
+
+## ✅ Pre-Phase Checklist
+
 - [ ] HP EliteDesk 800 G5 powered on and accessible
 - [ ] USB drive with Proxmox VE ISO prepared
 - [ ] Network cable connected (DHCP available)
 - [ ] Monitor and keyboard connected for initial setup
-- [ ] **CRITICAL**: Backup any existing data - this will wipe the system
-
-### Phase 1 Overview
-**Goal**: Install Proxmox hypervisor and create TrueNAS VM for centralized storage
-**Time Estimate**: 2-3 hours
-**Risk Level**: High (system wipe)
+- [ ] **CRITICAL:** Backup any existing data – this will wipe the system
 
 ---
 
-## Step 1: Proxmox VE Installation
+## 🚦 Phase 1 Overview
+
+- **Goal:** Install Proxmox VE as hypervisor and bring up a TrueNAS VM for central ZFS storage
+- **Estimated Time:** 2–3 hours
+- **Risk Level:** High (system wipe on install)
+
+---
+
+## ⚡ Step 1: Proxmox VE Installation
 
 ### 1.1 Boot from USB
-1. Insert Proxmox VE USB installer
-2. Boot from USB (F9 on HP EliteDesk)
+
+1. Insert prepared Proxmox VE USB installer
+2. Boot (usually F9 for HP; check your hardware)
 3. Select "Install Proxmox VE"
 
 ### 1.2 System Configuration
-1. **Target Harddisk**: Select your RAID 1 array
-2. **Country/Timezone**: Set appropriately  
-3. **Administrator Password**: Use strong password - write it down!
-4. **Email**: Your email for system alerts
-5. **Management Interface**: 
-  - Use DHCP initially
-  - Note the IP address shown (you'll need this)
 
-Step 1 Complete When**: You can access Proxmox web interface
+- Target Hard Disk: Select your RAID 1 array
+- Set country/timezone, *strong* admin password, and valid email for alerts
+- Use DHCP for management interface, note the assigned IP
+
+> ✅ **Complete when** you can access the Proxmox web UI from LAN
 
 ---
 
-## Step 2: Proxmox Initial Configuration
+## 🔧 Step 2: Proxmox Initial Configuration
 
-### 2.1 Repository Setup
-```bash
-# SSH into Proxmox or use Shell in web interface
-# Remove enterprise repository (we're using free)
+### 2.1 Repository & Updates
+
+```
+# Remove enterprise repo
 rm /etc/apt/sources.list.d/pve-enterprise.list
 
-# Add no-subscription repository
+# Add the free no-subscription repo
 echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" > /etc/apt/sources.list.d/pve-no-subscription.list
 
 # Update system
 apt update && apt upgrade -y
 ```
 
-### 2.2 Network Configuration (Static IP)
-1. In Proxmox web interface: System Step 2 Complete When**: Proxmox accessible via static IP
+### 2.2 Configure Static IP
+
+- Edit the node → System → Network in the Proxmox web UI
+- Assign a static IP within your 10.0.0.x subnet
+
+> ✅ **Complete when** Proxmox is reachable via its static IP
 
 ---
 
-## Step 3: TrueNAS VM Creation
+## 💾 Step 3: TrueNAS VM Creation
 
-### 3.1 Download TrueNAS ISO
-1. In Proxmox: local (pve) Upload
-2. Download TrueNAS SCALE ISO directly or upload from PC
-3. Wait for upload to complete
+### 3.1 Upload TrueNAS ISO
 
-### 3.2 Create TrueNAS VM
-1. **Create VM** button in Proxmox
-2. **General**:
-  - VM ID: `100`
-  - Name: `TrueNAS-Storage`
-3. **OS**:
-  - ISO: Select TrueNAS SCALE ISO
-  - Guest OS: Linux 6.x - 2.6 Kernel
-4. **System**:
-  - Machine: q35
-  - BIOS: OVMF (UEFI)
-  - Add EFI Disk: Hardware Hard Disk
-2. **For each storage disk you want to add**:
-  - Bus/Device: SATA (next available)
-  - Disk size: According to your setup
-  - Cache: Write back
-3. **Minimum recommendation**: 2x 1TB disks for mirrored storage
+- Download [TrueNAS SCALE ISO](https://www.truenas.com/download-truenas-scale/)
+- In Proxmox web UI → local storage → Upload ISO
 
-** **Interfaces** **General** **Pools** **Pools** **Add Dataset**
-2. Create these datasets:
-  - `media` (for Plex content)
-  - `documents` (for Paperless-ngx)
-  - `backups` (for VM backups and configs)
+### 3.2 Proxmox VM Settings
 
-** **NFS** Start Automatically
-3. **NFSv4**: **Unix (NFS) Shares** Enabled
-  - **Quiet**: Enabled
-  - **Quiet**: Enabled
-  - **Quiet**: **Users** **Pools** **Edit Permissions**
-2. Set owner to `homelab-user:homelab` (1000:1000)
-3. **Apply recursively**: Step 5 Complete When**: You can mount NFS shares from another Linux system
+- Create VM:
+  - **General:** Name: TrueNAS-Storage, VM ID: 100
+  - **OS:** ISO Image: TrueNAS SCALE, Guest: Linux 6.x or later
+  - **System:** q35, BIOS: OVMF (UEFI). Add EFI disk
+  - **Disks:** Attach your RAID disks (SATA, suitable size)
+- Allocate RAM/CPU generously
+
+### 3.3 Install TrueNAS
+
+1. Boot new VM and install TrueNAS per on-screen instructions.
+2. After install, access TrueNAS web interface (note assigned IP).
 
 ---
 
-## Phase 1 Completion Criteria
+## 📁 NFS and Dataset Setup
 
-### TrueNAS VM Check all settings
-2. Verify ISO is properly attached
-3. Check VM logs: TrueNAS VM Log
-4. Delete VM and recreate if necessary
-
-### If Storage Pool Creation Fails:
-1. **Storage** **Export/Disconnect** pool
-2. Verify disks are healthy: **Storage** **NFS**
-2. Verify network connectivity: `ping 10.0.0.110`
-3. Check share permissions and network restrictions
-4. Test from another Linux machine: `showmount -e 10.0.0.110`
-
-### Complete Reset:
-1. If everything fails, reinstall Proxmox from scratch
-2. VMs can be recreated easily at this stage
-3. No data loss since this is foundation phase
+1. **Create ZFS Pool(s):** Use your attached disks (mirrored if possible).
+2. **Create Datasets:**
+    - `media` (for Plex content)
+    - `documents` (for Paperless-ngx)
+    - `backups` (for configs/snapshots)
+3. **Configure NFS Shares** for each dataset for your Proxmox/Docker hosts:
+    - Enable NFSv4, restrict to local subnet
+    - Set permissions for target user/group (e.g. homelab-user:homelab)
 
 ---
 
-## Pre-Phase 2 Snapshot
+## 🧪 Verification & Troubleshooting
 
-**Before proceeding to Phase 2:**
+- Test mounting NFS shares from a Linux system:
+  ```
+  showmount -e 10.0.0.11
+  # Should display exports, try mounting manually if needed
+  ```
+- If pool creation or shares fail:
+  - Check disks: *Storage* → *Disks*
+  - Test network: `ping 10.0.0.11`
+  - Verify NFS perms/Firewall
 
-1. **Proxmox Backup**:
-  - Datacenter Create backup job for TrueNAS VM
-  - Or manually: TrueNAS VM Backup now
-
-2. **VM Snapshot**:
-  - TrueNAS VM Take Snapshot
-  - Name: `Phase1-Complete-Working`
-
-3. **Configuration Backup**:
-  - Export TrueNAS configuration: **System** **Save Config**
-  - Save file to external location
+**If all else fails:**  
+- Repair pool, recreate VM, or (before moving on) **reinstall Proxmox/TrueNAS** if it’s a new setup (safer to start fresh now).
 
 ---
 
-## Step 6: Initial Security Hardening
+## 🔒 Step 6: Initial Security Hardening
 
-### 6.1 Proxmox 2FA Setup (YubiKey/TOTP)
-1. **Datacenter** **Add** **Authentication** **Yubico OTP**
-2. **ID**: `yubikey`
-3. **API ID** and **Secret Key**: From Yubico account
-4. Configure your YubiKey at yubico.com
+### 6.1 Proxmox 2FA
 
-**Enable 2FA for root user**:
-1. **Datacenter** **Users** **Edit**
-2. **Two Factor**: Select `totp` or `yubikey`
-3. **Setup TOTP**: Scan QR code with authenticator app
-4. **Test login**: Logout and login with 2FA
+- Go to Datacenter → Authentication → Add Yubico OTP or TOTP
+- Link YubiKey ([Yubico portal](https://www.yubico.com/))
+- Enable 2FA for your user: Datacenter → Users → Edit → Two Factor
+- Test login with 2FA
 
-### 6.2 Proxmox SSH Hardening
-```bash
-# SSH into Proxmox host
-nano /etc/ssh/sshd_config
+### 6.2 Harden Proxmox SSH
 
-# Add/modify these settings:
+Edit `/etc/ssh/sshd_config`:
+
+```
 PermitRootLogin no
 PasswordAuthentication no
 PubkeyAuthentication yes
@@ -166,39 +156,46 @@ ClientAliveInterval 300
 ClientAliveCountMax 2
 ```
 
-**Create non-root user for SSH**:
-```bash
-# Create admin user
+- Create a separate `proxmox-admin` user and set up SSH pubkey auth
+
+```
 useradd -m -s /bin/bash -G sudo proxmox-admin
 passwd proxmox-admin
-
-# Set up SSH key authentication (replace with your public key)
 mkdir /home/proxmox-admin/.ssh
 echo "your-ssh-public-key" > /home/proxmox-admin/.ssh/authorized_keys
 chown -R proxmox-admin:proxmox-admin /home/proxmox-admin/.ssh
 chmod 700 /home/proxmox-admin/.ssh
 chmod 600 /home/proxmox-admin/.ssh/authorized_keys
-
-# Restart SSH service
 systemctl restart sshd
 ```
 
-### 6.3 TrueNAS Security Hardening  
-1. **System** **Access**
-  - **Console Menu**: Disable (prevents local access without login)
-  - **Serial Console**: Disable if not needed
-  
-2. **Network** **Alert Services**
-  - Configure email alerts for system issues
-  - Test alert delivery
+### 6.3 TrueNAS Hardening
 
-4. **System** Step 6 Complete When**: 
-- [ ] 2FA working for Proxmox web interface
-- [ ] SSH hardened with key-only authentication
-- [ ] TrueNAS secured with basic hardening
-- [ ] Initial Cloudflare tunnel working for Proxmox access (optional at this stage)
+- *Disable console menu access*: System Access → Console menu: Disable
+- *Set up alert emails* and test delivery
 
 ---
 
-## Next: Phase 2 - Docker Services VM
-Ready to proceed when Phase 1 completion criteria are met and snapshots are taken.
+## 🗂️ Backups & Snapshots
+
+**Before moving on to Phase 2:**
+
+- Create a Proxmox VM backup job for TrueNAS or manual backup
+- Take a VM snapshot: `Phase1-Complete-Working`
+- Download/export TrueNAS config (System → Save Config), store it externally
+
+---
+
+## ➡️ Next Steps
+
+- Once all the above is verified, secure, and backed up, proceed to [Phase 2: Docker Services VM](./phase-2-docker-services.md).
+
+---
+
+**HomeLab Tip:**  
+If at any point a step fails and you’re not in production, it is safer to restart from scratch than to try patching a broken foundation.
+
+---
+
+*For questions, see the [Installation README](../README.md) or open an issue!*
+```
