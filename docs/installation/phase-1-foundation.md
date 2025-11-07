@@ -6,16 +6,16 @@
 
 ## 📑 Table of Contents
 
-- [✅ Pre-Phase Checklist](#pre-phase-checklist)
-- [🚦 Phase Overview](#phase-1-overview)
-- [⚡ Step 1: Proxmox VE Installation](#step-1-proxmox-ve-installation)
-- [🔧 Step 2: Proxmox Initial Configuration](#step-2-proxmox-initial-configuration)
-- [💾 Step 3: TrueNAS VM Creation](#step-3-truenas-vm-creation)
-- [📁 NFS & Dataset Setup](#nfs-and-dataset-setup)
-- [🧪 Verification & Troubleshooting](#verification--troubleshooting)
-- [🔒 Step 6: Initial Security Hardening](#step-6-initial-security-hardening)
-- [🗂️ Backups & Snapshots](#backups--snapshots)
-- [➡️ Next Steps](#next-steps)
+- [✅ Pre-Phase Checklist](#-pre-phase-checklist)
+- [🚦 Phase 1 Overview](#-phase-1-overview)
+- [⚡ Step 1: Proxmox VE Installation](#-step-1-proxmox-ve-installation)
+- [🔧 Step 2: Proxmox Initial Configuration](#-step-2-proxmox-initial-configuration)
+- [💾 Step 3: TrueNAS VM Creation](#-step-3-truenas-vm-creation)
+- [📁 NFS and Dataset Setup](#-nfs-and-dataset-setup)
+- [🧪 Verification & Troubleshooting](#-verification--troubleshooting)
+- [🔒 Step 6: Initial Security Hardening](#-step-6-initial-security-hardening)
+- [🗂️ Backups & Snapshots](#-backups--snapshots)
+- [➡️ Next Steps](#-next-steps)
 
 ---
 
